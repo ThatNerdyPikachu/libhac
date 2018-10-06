@@ -2,6 +2,7 @@ package libhac
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 )
 
@@ -54,7 +55,7 @@ func (c *HacClient) DoRequest(method, url string, sendDauthToken, sendEdgeToken 
 	}
 
 	if sendDauthToken {
-		req.Header.Set("X-DeviceAuthorization", c.DauthToken)
+		req.Header.Set("X-DeviceAuthorization", fmt.Sprintf("Bearer %s", c.DauthToken))
 	}
 
 	if sendEdgeToken {

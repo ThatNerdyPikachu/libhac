@@ -1,7 +1,7 @@
 package libhac
 
 type idResponse struct {
-	IDPairs []idPair `json:"id_pair"`
+	IDPairs []idPair `json:"id_pairs"`
 }
 
 type idPair struct {

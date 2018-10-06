@@ -7,9 +7,9 @@ import (
 )
 
 type SuperflyTitle struct {
-	ID      string
-	Version int
-	Type    string
+	ID      string `json:"title_id"`
+	Version int    `json:"version"`
+	Type    string `json:"title_type"`
 }
 
 func (c *HacClient) GetSuperflyResponse(tid string) ([]SuperflyTitle, error) {
