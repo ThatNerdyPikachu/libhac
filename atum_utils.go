@@ -1,4 +1,4 @@
-package libatum
+package libhac
 
 import (
 	"encoding/binary"

@@ -1,14 +1,6 @@
-package libatum
+package libhac
 
-import (
-	"encoding/xml"
-	"net/http"
-)
-
-type AtumClient struct {
-	HTTP      *http.Client
-	EdgeToken string
-}
+import "encoding/xml"
 
 type CNMT struct {
 	Path                          string

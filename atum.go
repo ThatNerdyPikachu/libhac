@@ -1,61 +1,22 @@
-package libatum
+package libhac
 
 import (
 	_ "crypto/sha256"
 	_ "crypto/sha512"
-	"crypto/tls"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/opencontainers/go-digest"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 )
 
-func NewAtumClient(cert, key, edgeToken string) (AtumClient, error) {
-	device, err := tls.LoadX509KeyPair(cert, key)
-	if err != nil {
-		return AtumClient{}, err
-	}
-
-	return AtumClient{
-		&http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					Certificates:       []tls.Certificate{device},
-					InsecureSkipVerify: true,
-				},
-			},
-		},
-		edgeToken,
-	}, nil
-}
-
-func (c *AtumClient) DoRequest(method, url string, sendEdgeToken bool) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, nil)
-	if err != nil {
-		return &http.Response{}, err
-	}
-
-	if sendEdgeToken {
-		req.Header.Set("X-Nintendo-DenebEdgeToken", c.EdgeToken)
-	}
-
-	resp, err := c.HTTP.Do(req)
-	if err != nil {
-		return &http.Response{}, err
-	}
-
-	return resp, nil
-}
-
-func (c *AtumClient) Download(url, path string, sendEdgeToken bool) error {
-	resp, err := c.DoRequest("GET", url, sendEdgeToken)
+func (c *HacClient) Download(url, path string, sendEdgeToken bool) error {
+	resp, err := c.DoRequest("GET", url, false, sendEdgeToken)
 	if err != nil {
 		return err
 	}
@@ -75,7 +36,7 @@ func (c *AtumClient) Download(url, path string, sendEdgeToken bool) error {
 	return nil
 }
 
-func (c *AtumClient) TestEdgeToken() error {
+func (c *HacClient) TestEdgeToken() error {
 	id, err := c.GetCNMTID("0100000000010000", 0)
 	if err != nil || id == "" {
 		return errors.New("edge token is invalid!")
@@ -84,9 +45,9 @@ func (c *AtumClient) TestEdgeToken() error {
 	return nil
 }
 
-func (c *AtumClient) GetCNMTID(tid string, ver int) (string, error) {
+func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 	resp, err := c.DoRequest("HEAD", fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/t/a/%s/%d", tid, ver),
-		true)
+		false, true)
 	if err != nil {
 		return "", err
 	}
@@ -100,7 +61,7 @@ func (c *AtumClient) GetCNMTID(tid string, ver int) (string, error) {
 	return cnmtID, nil
 }
 
-func (c *AtumClient) DownloadCNMT(cnmtID string, out string) error {
+func (c *HacClient) DownloadCNMT(cnmtID string, out string) error {
 	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out, true)
 	if err != nil {
 		return err
@@ -240,7 +201,7 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 	}, nil
 }
 
-func (c *AtumClient) DownloadContentEntry(ce ContentEntry, out string) error {
+func (c *HacClient) DownloadContentEntry(ce ContentEntry, out string) error {
 	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out, true)
 	if err != nil {
 		return err
@@ -326,7 +287,7 @@ func GetRightsID(tid, mKeyRev string) string {
 		mKeyRev)
 }
 
-func (c *AtumClient) DownloadCetk(rightsID, out string) error {
+func (c *HacClient) DownloadCetk(rightsID, out string) error {
 	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/r/t/%s", rightsID),
 		out, true)
 	if err != nil {

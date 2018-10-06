@@ -1,40 +1,47 @@
-package libshogun
+package libhac
 
-import (
-	"net/http"
-)
-
-// ShogunClient repersents a client to interact with Shogun
-type ShogunClient struct {
-	HTTP       *http.Client
-	DauthToken string
+type idResponse struct {
+	IDPairs []idPair `json:"id_pair"`
 }
 
-// Title repersents a title in Shogun
+type idPair struct {
+	ID int `json:"id"`
+}
+
 type Title struct {
-	ID          int64
-	Name        string
-	BannerURL   string
-	ReleaseDate string
-	IsNew       bool
-	Description string
-	Genre       string
-	Size        int64
-	Screenshots []string
-	Movies      []*Movie
-	Publisher   *Publisher
-	TitleID     string
-	IconURL     string
+	ID           int           `json:"id"`
+	Name         string        `json:"formal_name"`
+	BannerURL    string        `json:"hero_banner_url"`
+	ReleaseDate  string        `json:"release_date_on_eshop"`
+	IsNew        bool          `json:"is_new"`
+	Description  string        `json:"description"`
+	Genre        string        `json:"genre"`
+	Size         int           `json:"total_rom_size"`
+	Screenshots  []Screenshot  `json:"screenshots"`
+	Movies       []Movie       `json:"movies"`
+	Publisher    Publisher     `json:"publisher"`
+	Applications []Application `json:"applications"`
 }
 
-// Movie repersents a movie
+type Screenshot struct {
+	Images []Image `json:"images"`
+}
+
+type Image struct {
+	URL string `json:"url"`
+}
+
 type Movie struct {
-	URL       string
-	Thumbnail string
+	URL       string `json:"movie_url"`
+	Thumbnail string `json:"thumbnail_url"`
 }
 
-// Publisher repersents a title's publisher
 type Publisher struct {
-	ID   int64
-	Name string
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Application struct {
+	ID    string `json:"id"`
+	Image string `json:"image_url"`
 }
