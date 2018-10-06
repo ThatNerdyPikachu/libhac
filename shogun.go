@@ -54,7 +54,7 @@ func (c *HacClient) GetTitleData(nsID int) (title Title, err error) {
 
 	t := Title{}
 
-	err = json.Unmarshal(resp, t)
+	err = json.Unmarshal(resp, &t)
 	if err != nil {
 		return Title{}, err
 	}
