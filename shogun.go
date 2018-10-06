@@ -27,7 +27,6 @@ func (c *HacClient) TestDauthToken() error {
 }
 
 func (c *HacClient) GetNSID(tid string) (nsID int, err error) {
-	// /contents/ids?shop_id=3&lang=en&title_ids={TID}&country={Region}&type=title
 	resp, err := c.doShogunRequest(fmt.Sprintf("/contents/ids?shop_id=4&lang=en&country=US&type=title&title_ids=%s",
 		tid))
 	if err != nil {
