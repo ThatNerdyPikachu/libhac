@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-func (c *HacClient) Download(url, path string, sendEdgeToken bool) error {
+func (c *HacClient) download(url, path string, sendEdgeToken bool) error {
 	resp, err := c.DoRequest("GET", url, false, sendEdgeToken)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 }
 
 func (c *HacClient) DownloadCNMT(cnmtID string, out string) error {
-	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out, true)
+	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out, true)
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 }
 
 func (c *HacClient) DownloadContentEntry(ce ContentEntry, out string) error {
-	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out, true)
+	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out, true)
 	if err != nil {
 		return err
 	}
@@ -288,7 +288,7 @@ func GetRightsID(tid, mKeyRev string) string {
 }
 
 func (c *HacClient) DownloadCetk(rightsID, out string) error {
-	err := c.Download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/r/t/%s", rightsID),
+	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/r/t/%s", rightsID),
 		out, true)
 	if err != nil {
 		return err
