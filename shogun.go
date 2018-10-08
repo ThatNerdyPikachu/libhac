@@ -1,6 +1,7 @@
 package libhac
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,7 @@ import (
 
 func (c *HacClient) doShogunRequest(endpoint string) (response []byte, err error) {
 	resp, err := c.DoRequest("GET", fmt.Sprintf("https://bugyo.hac.lp1.eshop.nintendo.net/shogun/v1%s",
-		endpoint), true, false)
+		endpoint), []tls.Certificate{c.ShopCert}, true, false)
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()

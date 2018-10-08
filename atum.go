@@ -3,6 +3,7 @@ package libhac
 import (
 	_ "crypto/sha256"
 	_ "crypto/sha512"
+	"crypto/tls"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -15,8 +16,8 @@ import (
 	"strings"
 )
 
-func (c *HacClient) download(url, path string, sendEdgeToken bool) error {
-	resp, err := c.DoRequest("GET", url, false, sendEdgeToken)
+func (c *HacClient) download(url, path string) error {
+	resp, err := c.DoRequest("GET", url, []tls.Certificate{c.DeviceCert}, false, true)
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func (c *HacClient) TestEdgeToken() error {
 
 func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 	resp, err := c.DoRequest("HEAD", fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/t/a/%s/%d", tid, ver),
-		false, true)
+		[]tls.Certificate{c.DeviceCert}, false, true)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +63,7 @@ func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 }
 
 func (c *HacClient) DownloadCNMT(cnmtID string, out string) error {
-	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out, true)
+	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out)
 	if err != nil {
 		return err
 	}
@@ -202,7 +203,7 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 }
 
 func (c *HacClient) DownloadContentEntry(ce ContentEntry, out string) error {
-	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out, true)
+	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out)
 	if err != nil {
 		return err
 	}
@@ -289,7 +290,7 @@ func GetRightsID(tid, mKeyRev string) string {
 
 func (c *HacClient) DownloadCetk(rightsID, out string) error {
 	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/r/t/%s", rightsID),
-		out, true)
+		out)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package libhac
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -14,7 +15,7 @@ type SuperflyTitle struct {
 
 func (c *HacClient) GetSuperflyResponse(tid string) ([]SuperflyTitle, error) {
 	resp, err := c.DoRequest("GET", fmt.Sprintf("https://superfly.hac.lp1.d4c.nintendo.net/v1/a/%s/dv", tid),
-		false, true)
+		[]tls.Certificate{c.DeviceCert}, false, true)
 	if err != nil {
 		return []SuperflyTitle{}, err
 	}
