@@ -264,7 +264,7 @@ func GenerateCNMTXML(cnmt CNMT, headerPath, cnmtNCAName, out string) error {
 		pid,
 	}
 
-	output, err := xml.MarshalIndent(x, "", "	")
+	output, err := xml.MarshalIndent(x, "", "\t")
 	if err != nil {
 		return err
 	}
