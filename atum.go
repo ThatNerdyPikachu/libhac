@@ -244,7 +244,7 @@ func GenerateCNMTXML(cnmt CNMT, headerPath, cnmtNCAName, out string) error {
 		cnmt.MasterKeyRevision,
 	})
 
-	var pid string
+	pid := ""
 	if strings.HasSuffix(cnmt.ID, "800") {
 		pid = fmt.Sprintf("0x%s000", strings.TrimSuffix(cnmt.ID, "800"))
 	} else if strings.HasSuffix(cnmt.ID, "000") {
