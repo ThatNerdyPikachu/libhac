@@ -4,10 +4,8 @@ import (
 	_ "crypto/sha256"
 	_ "crypto/sha512"
 	"crypto/tls"
-	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/opencontainers/go-digest"
 	"io"
 	"io/ioutil"
 	"os"
@@ -204,78 +202,6 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 
 func (c *HacClient) DownloadContentEntry(ce ContentEntry, out string) error {
 	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func GenerateCNMTXML(cnmt CNMT, headerPath, cnmtNCAName, out string) error {
-	ce := []ContentEntryXML{}
-
-	for _, v := range cnmt.ContentEntries {
-		ce = append(ce, ContentEntryXML{
-			v.Type,
-			v.ID,
-			v.Size,
-			v.Hash,
-			cnmt.MasterKeyRevision,
-		})
-	}
-
-	c, err := os.Stat(cnmt.Path)
-	if err != nil {
-		return err
-	}
-
-	cf, err := ioutil.ReadFile(cnmt.Path)
-	if err != nil {
-		return err
-	}
-
-	dig := digest.FromBytes(cf)
-
-	ce = append(ce, ContentEntryXML{
-		"Meta",
-		strings.Split(cnmtNCAName, ".")[0],
-		fmt.Sprintf("%d", c.Size()),
-		dig.Hex(),
-		cnmt.MasterKeyRevision,
-	})
-
-	pid := ""
-	if strings.HasSuffix(cnmt.ID, "800") {
-		pid = fmt.Sprintf("0x%s000", strings.TrimSuffix(cnmt.ID, "800"))
-	} else if strings.HasSuffix(cnmt.ID, "000") {
-		pid = fmt.Sprintf("0x%s800", strings.TrimSuffix(cnmt.ID, "000"))
-	}
-
-	x := CNMTXML{
-		xml.Name{},
-		cnmt.Type,
-		cnmt.ID,
-		cnmt.Version,
-		cnmt.RequiredDownloadSystemVersion,
-		ce,
-		cnmt.Digest,
-		cnmt.MasterKeyRevision,
-		cnmt.RequiredSystemVersion,
-		pid,
-	}
-
-	output, err := xml.MarshalIndent(x, "", "\t")
-	if err != nil {
-		return err
-	}
-
-	f, err := os.Create(out)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.Write(output)
 	if err != nil {
 		return err
 	}
