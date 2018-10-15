@@ -239,12 +239,7 @@ func GetTitleKeyFromCetk(path string) (string, error) {
 	return tk, nil
 }
 
-func GenerateTicket(in, titleKey, mKeyRev, rightsID, out string) error {
-	inf, err := ioutil.ReadFile(in)
-	if err != nil {
-		return err
-	}
-
+func GenerateTicket(in []byte, titleKey, mKeyRev, rightsID, out string) error {
 	tk, err := getHexBytes(titleKey)
 	if err != nil {
 		return err
@@ -260,41 +255,41 @@ func GenerateTicket(in, titleKey, mKeyRev, rightsID, out string) error {
 		return err
 	}
 
-	inf[0x180] = tk[0]
-	inf[0x181] = tk[1]
-	inf[0x182] = tk[2]
-	inf[0x183] = tk[3]
-	inf[0x184] = tk[4]
-	inf[0x185] = tk[5]
-	inf[0x186] = tk[6]
-	inf[0x187] = tk[7]
-	inf[0x188] = tk[8]
-	inf[0x189] = tk[9]
-	inf[0x18A] = tk[10]
-	inf[0x18B] = tk[11]
-	inf[0x18C] = tk[12]
-	inf[0x18D] = tk[13]
-	inf[0x18E] = tk[14]
-	inf[0x18F] = tk[15]
+	in[0x180] = tk[0]
+	in[0x181] = tk[1]
+	in[0x182] = tk[2]
+	in[0x183] = tk[3]
+	in[0x184] = tk[4]
+	in[0x185] = tk[5]
+	in[0x186] = tk[6]
+	in[0x187] = tk[7]
+	in[0x188] = tk[8]
+	in[0x189] = tk[9]
+	in[0x18A] = tk[10]
+	in[0x18B] = tk[11]
+	in[0x18C] = tk[12]
+	in[0x18D] = tk[13]
+	in[0x18E] = tk[14]
+	in[0x18F] = tk[15]
 
-	inf[0x285] = mkr[0]
+	in[0x285] = mkr[0]
 
-	inf[0x2A0] = rid[0]
-	inf[0x2A1] = rid[1]
-	inf[0x2A2] = rid[2]
-	inf[0x2A3] = rid[3]
-	inf[0x2A4] = rid[4]
-	inf[0x2A5] = rid[5]
-	inf[0x2A6] = rid[6]
-	inf[0x2A7] = rid[7]
-	inf[0x2A8] = rid[8]
-	inf[0x2A9] = rid[9]
-	inf[0x2AA] = rid[10]
-	inf[0x2AB] = rid[11]
-	inf[0x2AC] = rid[12]
-	inf[0x2AD] = rid[13]
-	inf[0x2AE] = rid[14]
-	inf[0x2AF] = rid[15]
+	in[0x2A0] = rid[0]
+	in[0x2A1] = rid[1]
+	in[0x2A2] = rid[2]
+	in[0x2A3] = rid[3]
+	in[0x2A4] = rid[4]
+	in[0x2A5] = rid[5]
+	in[0x2A6] = rid[6]
+	in[0x2A7] = rid[7]
+	in[0x2A8] = rid[8]
+	in[0x2A9] = rid[9]
+	in[0x2AA] = rid[10]
+	in[0x2AB] = rid[11]
+	in[0x2AC] = rid[12]
+	in[0x2AD] = rid[13]
+	in[0x2AE] = rid[14]
+	in[0x2AF] = rid[15]
 
 	tik, err := os.Create(out)
 	if err != nil {
@@ -302,7 +297,7 @@ func GenerateTicket(in, titleKey, mKeyRev, rightsID, out string) error {
 	}
 	defer tik.Close()
 
-	_, err = tik.Write(inf)
+	_, err = tik.Write(in)
 	if err != nil {
 		return err
 	}
