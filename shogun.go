@@ -10,7 +10,7 @@ import (
 
 func (c *HacClient) doShogunRequest(endpoint string) (response []byte, err error) {
 	resp, err := c.DoRequest("GET", fmt.Sprintf("https://bugyo.hac.lp1.eshop.nintendo.net/shogun/v1%s",
-		endpoint), []tls.Certificate{c.ShopCert}, true, false)
+		endpoint), []tls.Certificate{*c.ShopCert}, true, false)
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
@@ -48,17 +48,17 @@ func (c *HacClient) GetNSID(tid string) (nsID int, err error) {
 	return r.IDPairs[0].ID, nil
 }
 
-func (c *HacClient) GetTitleData(nsID int) (title Title, err error) {
+func (c *HacClient) GetTitleData(nsID int) (title *Title, err error) {
 	resp, err := c.doShogunRequest(fmt.Sprintf("/titles/%d?shop_id=4&lang=en&country=US", nsID))
 	if err != nil {
-		return Title{}, err
+		return nil, err
 	}
 
-	t := Title{}
+	t := &Title{}
 
-	err = json.Unmarshal(resp, &t)
+	err = json.Unmarshal(resp, t)
 	if err != nil {
-		return Title{}, err
+		return nil, err
 	}
 
 	return t, nil

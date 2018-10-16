@@ -1,8 +1,6 @@
 package libhac
 
 import (
-	_ "crypto/sha256"
-	_ "crypto/sha512"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -15,7 +13,7 @@ import (
 )
 
 func (c *HacClient) download(url, path string) error {
-	resp, err := c.DoRequest("GET", url, []tls.Certificate{c.DeviceCert}, false, true)
+	resp, err := c.DoRequest("GET", url, []tls.Certificate{*c.DeviceCert}, false, true)
 	if err != nil {
 		return err
 	}
@@ -46,7 +44,7 @@ func (c *HacClient) TestEdgeToken() error {
 
 func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 	resp, err := c.DoRequest("HEAD", fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/t/a/%s/%d", tid, ver),
-		[]tls.Certificate{c.DeviceCert}, false, true)
+		[]tls.Certificate{*c.DeviceCert}, false, true)
 	if err != nil {
 		return "", err
 	}
@@ -86,89 +84,89 @@ func DecryptNCA(path, out, hactoolPath string) error {
 	return nil
 }
 
-func ParseCNMT(path, headerPath string) (CNMT, error) {
+func ParseCNMT(path, headerPath string) (*CNMT, error) {
 	cnmt, err := os.Open(path)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 	defer cnmt.Close()
 
 	t, err := readHex(cnmt, 0xC, 1, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	tid, err := readHex(cnmt, 0x0, 8, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	version, err := readHex(cnmt, 0x8, 4, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	sysv, err := readHex(cnmt, 0x28, 8, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	dlsysv, err := readHex(cnmt, 0x18, 8, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	digest, err := readHex(cnmt, -0x20, 0x20, 2)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	to, err := readHex(cnmt, 0xE, 1, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	tableOffset, err := strconv.ParseInt(to, 16, 64)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	cec, err := readHex(cnmt, 0x10, 1, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
 	contentEntryCount, err := strconv.ParseInt(cec, 16, 64)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
-	ces := []ContentEntry{}
+	ces := []*ContentEntry{}
 	var i int64
 	for i = 0; i < contentEntryCount; i++ {
 		offset := 0x20 + tableOffset + 0x38*i
 
 		hash, err := readHex(cnmt, offset, 32, 0)
 		if err != nil {
-			return CNMT{}, err
+			return nil, err
 		}
 
 		id, err := readHex(cnmt, offset+0x20, 16, 0)
 		if err != nil {
-			return CNMT{}, err
+			return nil, err
 		}
 
 		size, err := readHex(cnmt, offset+0x30, 6, 0)
 		if err != nil {
-			return CNMT{}, err
+			return nil, err
 		}
 
 		ty, err := readHex(cnmt, offset+0x36, 1, 0)
 		if err != nil {
-			return CNMT{}, err
+			return nil, err
 		}
 
-		ces = append(ces, ContentEntry{
+		ces = append(ces, &ContentEntry{
 			hash,
 			id,
 			size,
@@ -178,16 +176,16 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 
 	header, err := os.Open(headerPath)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 	defer header.Close()
 
 	mKeyRev, err := readHex(header, 0x220, 0x1, 0)
 	if err != nil {
-		return CNMT{}, err
+		return nil, err
 	}
 
-	return CNMT{
+	return &CNMT{
 		path,
 		getCNMTType(t),
 		tid,
@@ -200,7 +198,7 @@ func ParseCNMT(path, headerPath string) (CNMT, error) {
 	}, nil
 }
 
-func (c *HacClient) DownloadContentEntry(ce ContentEntry, out string) error {
+func (c *HacClient) DownloadContentEntry(ce *ContentEntry, out string) error {
 	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/c/%s", ce.ID), out)
 	if err != nil {
 		return err

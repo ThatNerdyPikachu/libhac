@@ -7,21 +7,21 @@ import (
 )
 
 type HacClient struct {
-	DeviceCert tls.Certificate
-	ShopCert   tls.Certificate
+	DeviceCert *tls.Certificate
+	ShopCert   *tls.Certificate
 	DauthToken string
 	EdgeToken  string
 }
 
-func NewHacClient(deviceCert, deviceKey, dauthToken, edgeToken string) (HacClient, error) {
+func NewHacClient(deviceCert, deviceKey []byte, dauthToken, edgeToken string) (*HacClient, error) {
 	// lolwut
 	err := errors.New("")
 
 	device := tls.Certificate{}
-	if deviceCert != "" && deviceKey != "" {
-		device, err = tls.LoadX509KeyPair(deviceCert, deviceKey)
+	if deviceCert != nil && deviceKey != nil {
+		device, err = tls.X509KeyPair(deviceCert, deviceKey)
 		if err != nil {
-			return HacClient{}, err
+			return nil, err
 		}
 	}
 
@@ -79,12 +79,12 @@ Wnep8QKBgQCLz/TeN8DapOZJ0ylBzo2F2Oa2RkgGYEtMevBqeIWSVwGG4d89cIig
 9wzSlH1LFZ4aRiB+UPiQj0g0h8ivE2ewtfDpbEYnbb9jN7vIBroZAw==
 -----END RSA PRIVATE KEY-----`))
 	if err != nil {
-		return HacClient{}, err
+		return nil, err
 	}
 
-	return HacClient{
-		device,
-		shop,
+	return &HacClient{
+		&device,
+		&shop,
 		dauthToken,
 		edgeToken,
 	}, nil
@@ -93,7 +93,7 @@ Wnep8QKBgQCLz/TeN8DapOZJ0ylBzo2F2Oa2RkgGYEtMevBqeIWSVwGG4d89cIig
 func (c *HacClient) DoRequest(method, url string, certs []tls.Certificate, sendDauthToken, sendEdgeToken bool) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return &http.Response{}, err
+		return nil, err
 	}
 
 	if sendDauthToken {
@@ -104,7 +104,7 @@ func (c *HacClient) DoRequest(method, url string, certs []tls.Certificate, sendD
 		req.Header.Set("X-Nintendo-DenebEdgeToken", c.EdgeToken)
 	}
 
-	client := http.Client{
+	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				Certificates:       certs,
@@ -115,7 +115,7 @@ func (c *HacClient) DoRequest(method, url string, certs []tls.Certificate, sendD
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return &http.Response{}, err
+		return nil, err
 	}
 
 	return resp, nil

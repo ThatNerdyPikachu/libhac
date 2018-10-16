@@ -9,7 +9,7 @@ type CNMT struct {
 	RequiredDownloadSystemVersion string
 	Digest                        string
 	MasterKeyRevision             string
-	ContentEntries                []ContentEntry
+	ContentEntries                []*ContentEntry
 }
 
 type ContentEntry struct {
