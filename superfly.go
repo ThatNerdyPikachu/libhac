@@ -28,7 +28,7 @@ func (c *HacClient) GetSuperflyResponse(tid string) ([]*SuperflyTitle, error) {
 
 	t := []*SuperflyTitle{}
 
-	err = json.Unmarshal(body, t)
+	err = json.Unmarshal(body, &t)
 	if err != nil {
 		return nil, err
 	}
