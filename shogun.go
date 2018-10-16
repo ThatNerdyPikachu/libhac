@@ -21,7 +21,7 @@ func (c *HacClient) doShogunRequest(endpoint string) (response []byte, err error
 func (c *HacClient) TestDauthToken() error {
 	resp, err := c.doShogunRequest("/contents/ids?shop_id=4&lang=en&country=US&type=title&title_ids=999")
 	if err != nil || string(resp) != "{\"id_pairs\":[]}" {
-		return errors.New("edge token is invalid!")
+		return errors.New("dauth token is invalid!")
 	}
 
 	return nil
@@ -38,9 +38,9 @@ func (c *HacClient) GetNSID(tid string) (nsID int, err error) {
 		return -1, errors.New("ns id not avaliable for this title")
 	}
 
-	r := idResponse{}
+	r := &idResponse{}
 
-	err = json.Unmarshal(resp, &r)
+	err = json.Unmarshal(resp, r)
 	if err != nil {
 		return -1, err
 	}
