@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -60,23 +59,6 @@ func (c *HacClient) GetCNMTID(tid string, ver int) (string, error) {
 
 func (c *HacClient) DownloadCNMT(cnmtID string, out string) error {
 	err := c.download(fmt.Sprintf("https://atum.hac.lp1.d4c.nintendo.net/c/a/%s", cnmtID), out)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func DecryptNCA(path, out, hactoolPath string) error {
-	err := os.MkdirAll(out, 0700)
-	if err != nil {
-		return err
-	}
-
-	err = exec.Command(hactoolPath, "--exefsdir="+out+"/exefs", "--romfsdir="+out+"/romfs",
-		"--section0dir="+out+"/section0", "--section1dir="+out+"/section1",
-		"--section2dir="+out+"/section2", "--section3dir="+out+"/section3",
-		"--header="+out+"/header.bin", path).Run()
 	if err != nil {
 		return err
 	}
@@ -253,7 +235,7 @@ func GenerateTicket(in []byte, titleKey, mKeyRev, rightsID, out string) error {
 		return err
 	}
 
-	in[0x180] = tk[0]
+	/* in[0x180] = tk[0]
 	in[0x181] = tk[1]
 	in[0x182] = tk[2]
 	in[0x183] = tk[3]
@@ -287,7 +269,18 @@ func GenerateTicket(in []byte, titleKey, mKeyRev, rightsID, out string) error {
 	in[0x2AC] = rid[12]
 	in[0x2AD] = rid[13]
 	in[0x2AE] = rid[14]
-	in[0x2AF] = rid[15]
+	in[0x2AF] = rid[15] */
+
+	var i int64
+	for i = 0x180; i <= 0x18F; i++ {
+		in[i] = tk[i-0x180]
+	}
+
+	in[0x285] = mkr[0]
+
+	for i = 0x2A0; i <= 0x2AF; i++ {
+		in[i] = rid[i-0x2A0]
+	}
 
 	tik, err := os.Create(out)
 	if err != nil {
