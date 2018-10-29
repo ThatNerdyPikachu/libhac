@@ -235,42 +235,6 @@ func GenerateTicket(in []byte, titleKey, mKeyRev, rightsID, out string) error {
 		return err
 	}
 
-	/* in[0x180] = tk[0]
-	in[0x181] = tk[1]
-	in[0x182] = tk[2]
-	in[0x183] = tk[3]
-	in[0x184] = tk[4]
-	in[0x185] = tk[5]
-	in[0x186] = tk[6]
-	in[0x187] = tk[7]
-	in[0x188] = tk[8]
-	in[0x189] = tk[9]
-	in[0x18A] = tk[10]
-	in[0x18B] = tk[11]
-	in[0x18C] = tk[12]
-	in[0x18D] = tk[13]
-	in[0x18E] = tk[14]
-	in[0x18F] = tk[15]
-
-	in[0x285] = mkr[0]
-
-	in[0x2A0] = rid[0]
-	in[0x2A1] = rid[1]
-	in[0x2A2] = rid[2]
-	in[0x2A3] = rid[3]
-	in[0x2A4] = rid[4]
-	in[0x2A5] = rid[5]
-	in[0x2A6] = rid[6]
-	in[0x2A7] = rid[7]
-	in[0x2A8] = rid[8]
-	in[0x2A9] = rid[9]
-	in[0x2AA] = rid[10]
-	in[0x2AB] = rid[11]
-	in[0x2AC] = rid[12]
-	in[0x2AD] = rid[13]
-	in[0x2AE] = rid[14]
-	in[0x2AF] = rid[15] */
-
 	var i int64
 	for i = 0x180; i <= 0x18F; i++ {
 		in[i] = tk[i-0x180]
