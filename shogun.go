@@ -35,7 +35,7 @@ func (c *HacClient) GetNSID(tid string) (nsID int, err error) {
 	}
 
 	if string(resp) == "{\"id_pairs\":[]}" {
-		return -1, errors.New("ns id not avaliable for this title")
+		return -1, errors.New("ns id not available for this title")
 	}
 
 	r := &idResponse{}
